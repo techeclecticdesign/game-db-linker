@@ -74,18 +74,8 @@ func stripArticlePrefix(s string) string {
 
 /* Try to find numerical string corresponding to a releases sequel number,
  * and convert it to a roman numeral. */
-func sequelConvert(s string) string {
-	s = strings.TrimSpace(s)
-
-	/* find all occurances of : or -.  Convert to roman numeral if it makes sense to.  */
-	var sepLocs [][]int
-	sepLocs = regexp.MustCompile(`[-/:]`).FindAllStringIndex(s, -1)
-	sepLocs = append(sepLocs, []int{len(s)})
+func sequelConvert(s string, sepLocs [][]int) string {
 	for i := len(sepLocs) - 1; i >= 0; i-- {
-		/* trim whitespace */
-		for string(s[sepLocs[i][0]-1]) == string(" ") {
-			sepLocs[i][0] -= 1
-		}
 		last := strings.LastIndex(s[:sepLocs[i][0]], " ") + 1
 
 		lastWord := s[last:sepLocs[i][0]]
@@ -98,13 +88,17 @@ func sequelConvert(s string) string {
 }
 
 func main() {
+	var sepLocs [][]int // ending positions of the last word in the string
 	/* Simplify string to reduce stylistic differences, to facilitate more accurate comparison. */
 	parseString := func(input string) string {
 		result := stripEnclosed(input)
-		result = sequelConvert(result)
+		result = stripArticlePrefix(result)
+		/* find all occurances of : or -.  Convert to roman numeral if it makes sense to.  */
+		sepLocs = regexp.MustCompile(`[-/:]`).FindAllStringIndex(result, -1)
+		sepLocs = append(sepLocs, []int{len(result)})
+		result = sequelConvert(result, sepLocs)
 		result = stripSeparators(result)
 		result = strings.Join(strings.Fields(result), " ") // get rid of extra white space
-		result = stripArticlePrefix(result)
 		result = strings.ToLower(result)
 		return result
 	}
