@@ -62,6 +62,13 @@ func stripArticlePrefix(s string) string {
 	} else if strings.HasPrefix(s, "an ") {
 		return strings.TrimPrefix(s, "an ")
 	}
+	if strings.HasSuffix(s, ", the") {
+		return strings.TrimSuffix(s, ", the")
+	} else if strings.HasSuffix(s, ", a") {
+		return strings.TrimSuffix(s, ", a")
+	} else if strings.HasSuffix(s, ", an") {
+		return strings.TrimSuffix(s, ", an")
+	}
 	return s
 }
 
